@@ -12,8 +12,8 @@ import Syntax
 
 scanner :: T.TokenParser ()
 scanner = T.makeTokenParser style
-  where ops = ["\\", "+"]
-        names = []
+  where ops = ["\\", "=", "."]
+        names = ["let", "in"]
         style = haskellStyle {T.reservedOpNames = ops,
                               T.reservedNames = names,
                               T.commentLine = "#"}
@@ -50,6 +50,16 @@ number = do
     n <- nat
     return (Inum (fromIntegral n))
     
+letIn :: Parser Expr
+letIn = do
+    reserved "let"
+    x <- identifier
+    reservedOp "="
+    binding <- expr
+    reserved "in"
+    rest <- expr  
+    return (Let x binding rest)
+    
 lambda :: Parser Expr
 lambda = do
     reservedOp "\\"
@@ -60,6 +70,7 @@ lambda = do
 
 term :: Parser Expr
 term = parens expr
+    <|> letIn
     <|> variable
     <|> number
     <|> lambda
