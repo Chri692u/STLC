@@ -24,4 +24,8 @@ main = runInputT defaultSettings loop
     minput <- getInputLine "8) "
     case minput of
       Nothing -> outputStrLn "8("
-      Just input -> (liftIO $ process input) >> loop
+      Just input -> do
+          let first = head $ words $ input
+          case first of
+              ":load" -> (liftIO $ print "load command :D") >> loop
+              _ -> (liftIO $ process input) >> loop
