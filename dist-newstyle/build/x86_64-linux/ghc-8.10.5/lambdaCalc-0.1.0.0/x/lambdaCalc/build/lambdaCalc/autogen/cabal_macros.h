@@ -22,6 +22,28 @@
   (major1) == 4 && (major2) == 14 && (minor) <= 2)
 #endif /* MIN_VERSION_base */
 
+/* package haskeline-0.8.0.1 */
+#ifndef VERSION_haskeline
+#define VERSION_haskeline "0.8.0.1"
+#endif /* VERSION_haskeline */
+#ifndef MIN_VERSION_haskeline
+#define MIN_VERSION_haskeline(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  8 || \
+  (major1) == 0 && (major2) == 8 && (minor) <= 0)
+#endif /* MIN_VERSION_haskeline */
+
+/* package mtl-2.2.2 */
+#ifndef VERSION_mtl
+#define VERSION_mtl "2.2.2"
+#endif /* VERSION_mtl */
+#ifndef MIN_VERSION_mtl
+#define MIN_VERSION_mtl(major1,major2,minor) (\
+  (major1) <  2 || \
+  (major1) == 2 && (major2) <  2 || \
+  (major1) == 2 && (major2) == 2 && (minor) <= 2)
+#endif /* MIN_VERSION_mtl */
+
 /* package parsec-3.1.14.0 */
 #ifndef VERSION_parsec
 #define VERSION_parsec "3.1.14.0"
