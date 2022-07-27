@@ -21,6 +21,6 @@ data Value = Ilit Int
 
 instance Show Value where
     show (Ilit x) = show x
-    show Closure{} = "<<closure>>"
+    show Closure{} = "<closure>"
 
 type Env = [(Id, Value)]
