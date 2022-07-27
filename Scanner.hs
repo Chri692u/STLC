@@ -12,8 +12,8 @@ import Syntax
 
 scanner :: T.TokenParser ()
 scanner = T.makeTokenParser style
-  where ops = ["\\", "=", "."]
-        names = ["let", "in"]
+  where ops = ["\\", "=", ".", "+"]
+        names = ["let", "in", "apply"]
         style = haskellStyle {T.reservedOpNames = ops,
                               T.reservedNames = names,
                               T.commentLine = "#"}
@@ -67,18 +67,28 @@ lambda = do
     reservedOp "."
     body <- expr
     return (Lambda arg body)
-
+    
+apply :: Parser Expr
+apply = do
+    reserved "apply"
+    abs <- expr
+    arg <- expr
+    return (App abs arg)
+    
 term :: Parser Expr
 term = parens expr
-    <|> letIn
-    <|> variable
-    <|> number
-    <|> lambda
+       <|> letIn
+       <|> variable
+       <|> number
+       <|> lambda
+       <|> apply
 
 expr :: Parser Expr
-expr = do
-    es <- many1 term
-    return (foldl1 App es)
-    
+expr = X.buildExpressionParser table term
+
+table = [
+    [X.Infix (reservedOp "+" >> return (Binary Add)) X.AssocLeft]
+    ]
+            
 parseExpr :: String -> Either ParseError Expr
 parseExpr input = parse (content expr) "<stdin>" input

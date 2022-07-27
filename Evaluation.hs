@@ -11,11 +11,11 @@ eval (Lambda symbol expr)     env = Closure symbol expr env
 eval (App lambda symbol)      env = apply lambda' symbol'
         where lambda' = eval lambda env
               symbol' = eval symbol env
---eval (Binary op expr1 expr2) env = (evalOp op) (eval expr1 env) (eval expr2 env)
+eval (Binary op expr1 expr2) env = (evalOp op) (eval expr1 env) (eval expr2 env)
 
 -- Evaluation of binary operations
---evalOp :: Operation -> Value -> Value -> Value
---evalOp Add (Ilit expr1) (Ilit expr2) = Ilit (expr1 + expr2)
+evalOp :: Operation -> Value -> Value -> Value
+evalOp Add (Ilit expr1) (Ilit expr2) = Ilit (expr1 + expr2)
 
 -- Aux
 -- Symbol table lookup

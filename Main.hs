@@ -10,12 +10,23 @@ import System.Console.Haskeline
         
 process :: String -> IO ()
 process line = do
-  let result = parseExpr line
-  case result of
+  let ast = parseExpr line
+  case ast of
     Left error -> print error
     Right exp -> do
       let output = eval exp []
       print output
+
+run :: String -> IO ()
+run filename = do
+    s <- readFile filename
+    print s
+    let ast = parseExpr s
+    case ast of
+        Left error -> print error
+        Right exp -> do
+            let output = eval exp []
+            print output
 
 main :: IO ()
 main = runInputT defaultSettings loop
@@ -27,5 +38,6 @@ main = runInputT defaultSettings loop
       Just input -> do
           let first = head $ words $ input
           case first of
-              ":load" -> (liftIO $ print "load command :D") >> loop
+              ":run" -> (liftIO $ run ((words $ input)!!1)) >> loop
               _ -> (liftIO $ process input) >> loop
+              
