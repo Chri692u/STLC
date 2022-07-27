@@ -16,7 +16,9 @@ eval (Binary op expr1 expr2) env = (evalOp op) (eval expr1 env) (eval expr2 env)
 -- Evaluation of binary operations
 evalOp :: Operation -> Value -> Value -> Value
 evalOp Add (Ilit expr1) (Ilit expr2) = Ilit (expr1 + expr2)
-
+evalOp Sub (Ilit expr1) (Ilit expr2) = Ilit (expr1 - expr2)
+evalOp Mul (Ilit expr1) (Ilit expr2) = Ilit (expr1 * expr2)
+evalOp Div (Ilit expr1) (Ilit expr2) = Ilit (expr1 `div` expr2)
 -- Aux
 -- Symbol table lookup
 findSymbol :: Id -> Env -> Value

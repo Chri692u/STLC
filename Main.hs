@@ -40,4 +40,4 @@ main = runInputT defaultSettings loop
           case first of
               ":run" -> (liftIO $ run ((words $ input)!!1)) >> loop
               _ -> (liftIO $ process input) >> loop
-              
+

@@ -11,11 +11,14 @@ data Expr = Inum Int
     deriving (Show)
 
 data Operation = Add
+    | Sub
+    | Mul
+    | Div
     deriving (Show)
-           
+
 data Value = Ilit Int
     | Closure Id Expr Env
-           
+
 instance Show Value where
     show (Ilit x) = show x
     show Closure{} = "<<closure>>"

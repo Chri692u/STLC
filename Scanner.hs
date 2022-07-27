@@ -12,7 +12,7 @@ import Syntax
 
 scanner :: T.TokenParser ()
 scanner = T.makeTokenParser style
-  where ops = ["\\", "=", ".", "+"]
+  where ops = ["\\", "=", ".", "+", "-", "*", "/"]
         names = ["let", "in", "apply"]
         style = haskellStyle {T.reservedOpNames = ops,
                               T.reservedNames = names,
@@ -36,9 +36,9 @@ content p = do
     r <- p
     eof
     return r
-  
-nat :: Parser Integer
-nat = T.natural scanner
+
+int :: Parser Integer
+int = T.integer scanner
   
 variable :: Parser Expr
 variable = do
@@ -47,9 +47,9 @@ variable = do
 
 number :: Parser Expr
 number = do
-    n <- nat
+    n <- int
     return (Inum (fromIntegral n))
-    
+
 letIn :: Parser Expr
 letIn = do
     reserved "let"
@@ -87,8 +87,11 @@ expr :: Parser Expr
 expr = X.buildExpressionParser table term
 
 table = [
-    [X.Infix (reservedOp "+" >> return (Binary Add)) X.AssocLeft]
+    [X.Infix (reservedOp "*" >> return (Binary Mul)) X.AssocLeft,
+     X.Infix (reservedOp "/" >> return (Binary Div)) X.AssocLeft],
+    [X.Infix (reservedOp "+" >> return (Binary Add)) X.AssocLeft,
+     X.Infix (reservedOp "-" >> return (Binary Sub)) X.AssocLeft ]
     ]
-            
+ 
 parseExpr :: String -> Either ParseError Expr
 parseExpr input = parse (content expr) "<stdin>" input
