@@ -1,3 +1,8 @@
+#TODO
+1. Typed syntax
+2. AST types
+3. Update evaluation
+
 #Typed-Lambda-Calculus
 #REPL
 In terminal:
