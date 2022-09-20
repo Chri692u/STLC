@@ -20,7 +20,6 @@ process line = do
 run :: String -> IO ()
 run filename = do
     s <- readFile filename
-    print s
     let ast = parseExpr s
     case ast of
         Left error -> print error
@@ -40,4 +39,3 @@ main = runInputT defaultSettings loop
           case first of
               ":run" -> (liftIO $ run ((words $ input)!!1)) >> loop
               _ -> (liftIO $ process input) >> loop
-

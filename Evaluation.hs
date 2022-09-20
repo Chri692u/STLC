@@ -4,7 +4,7 @@ import Syntax
 
 -- Evaluation of literals, variables, let-in bindings, lambda abstractions and lambda application
 eval :: Expr -> Env -> Value
-eval (Inum intLit)            env = Ilit intLit
+eval (Nat intLit)             env = Ilit intLit
 eval (Var symbol)             env = findSymbol symbol env
 eval (Let symbol expr1 expr2) env = eval expr2 (expandEnv symbol expr1 env)
 eval (Lambda symbol expr)     env = Closure symbol expr env
@@ -14,7 +14,7 @@ eval (App lambda symbol)      env = apply lambda' symbol'
 eval (Binary op expr1 expr2) env = (evalOp op) (eval expr1 env) (eval expr2 env)
 
 -- Evaluation of binary operations
-evalOp :: Operation -> Value -> Value -> Value
+evalOp :: Primitive -> Value -> Value -> Value
 evalOp Add (Ilit expr1) (Ilit expr2) = Ilit (expr1 + expr2)
 evalOp Sub (Ilit expr1) (Ilit expr2) = Ilit (expr1 - expr2)
 evalOp Mul (Ilit expr1) (Ilit expr2) = Ilit (expr1 * expr2)

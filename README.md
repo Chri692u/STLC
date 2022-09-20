@@ -1,7 +1,4 @@
-#TODO
-1. Typed syntax
-2. AST types
-3. Update evaluation
+TODO: Types
 
 #Typed-Lambda-Calculus
 #REPL
@@ -9,19 +6,6 @@ In terminal:
 1. *ghci Main.hs*
 2. *main*
 3. Use the REPL or :run *filename* command
-
-#Syntax
-Expr = Int
-     | Let String Expr Expr
-     | Var String
-     | Lambda String Expr
-     | App Expr Expr
-     | Binary Operation Expr Expr
-     
-Operation = Add
-          | Sub
-          | Mul
-          | Div
           
 #Examples
 1. (\x. x) # abstraction

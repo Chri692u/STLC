@@ -2,15 +2,18 @@ module Syntax where
 
 type Id = String
 
-data Expr = Inum Int
+data Expr = Nat Int
     | Let Id Expr Expr
     | Var Id
     | Lambda Id Expr
     | App Expr Expr
-    | Binary Operation Expr Expr
+    | Binary Primitive Expr Expr
     deriving (Show)
 
-data Operation = Add
+data Type = TNat
+    | TArr Type Type
+
+data Primitive = Add
     | Sub
     | Mul
     | Div

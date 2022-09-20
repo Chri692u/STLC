@@ -48,7 +48,7 @@ variable = do
 number :: Parser Expr
 number = do
     n <- int
-    return (Inum (fromIntegral n))
+    return (Nat (fromIntegral n))
 
 letIn :: Parser Expr
 letIn = do
