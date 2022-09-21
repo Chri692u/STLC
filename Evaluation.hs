@@ -4,10 +4,11 @@ import Syntax
 
 -- Evaluation of literals, variables, let-in bindings, lambda abstractions and lambda application
 eval :: Expr -> Env -> Value
-eval (Nat intLit)             env = Ilit intLit
+eval (Lit (LInt x))           env = Ilit x
+eval (Lit (LBool b))          env = Blit b
 eval (Var symbol)             env = findSymbol symbol env
 eval (Let symbol expr1 expr2) env = eval expr2 (expandEnv symbol expr1 env)
-eval (Lambda symbol expr)     env = Closure symbol expr env
+eval (Lambda symbol _ expr)     env = Closure symbol expr env
 eval (App lambda symbol)      env = apply lambda' symbol'
         where lambda' = eval lambda env
               symbol' = eval symbol env

@@ -12,8 +12,8 @@ import Syntax
 
 scanner :: T.TokenParser ()
 scanner = T.makeTokenParser style
-  where ops = ["\\", "=", ".", "+", "-", "*", "/"]
-        names = ["let", "in", "apply"]
+  where ops = ["\\", "=", ".", "+", "-", "*", "/", ":"]
+        names = ["let", "in", "apply", "Bool", "Int", "True", "False"]
         style = haskellStyle {T.reservedOpNames = ops,
                               T.reservedNames = names,
                               T.commentLine = "#"}
@@ -48,7 +48,24 @@ variable = do
 number :: Parser Expr
 number = do
     n <- int
-    return (Nat (fromIntegral n))
+    return (Lit (LInt (fromIntegral n)))
+
+bool :: Parser Expr
+bool = (reserved "True" >> return (Lit (LBool True)))
+     <|> (reserved "False" >> return (Lit (LBool False)))
+
+tAtom :: Parser Type
+tAtom = tLit <|> (parens types)
+
+tLit :: Parser Type
+tLit = (reservedOp "Bool" >> return TBool)
+     <|> (reservedOp "Int" >> return TInt)
+
+types :: Parser Type
+types = X.buildExpressionParser tyops tAtom
+    where 
+        infixOp x f = X.Infix(reservedOp x >> return f)
+        tyops = [ [infixOp "->" TArr X.AssocRight] ]
 
 letIn :: Parser Expr
 letIn = do
@@ -64,9 +81,11 @@ lambda :: Parser Expr
 lambda = do
     reservedOp "\\"
     arg <- identifier
+    reservedOp ":"
+    type' <- types
     reservedOp "."
     body <- expr
-    return (Lambda arg body)
+    return (Lambda arg type' body)
     
 apply :: Parser Expr
 apply = do
@@ -80,6 +99,7 @@ term = parens expr
        <|> letIn
        <|> variable
        <|> number
+       <|> bool
        <|> lambda
        <|> apply
 
