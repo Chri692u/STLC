@@ -1,4 +1,6 @@
-TODO: Type checking
+TODO Interpreter: Type checking operators, adding new operators, constants
+TODO features: Polymorphic type system, standard library
+TODO REPL: add :t
 
 #Typed-Lambda-Calculus REPL
 In terminal:
