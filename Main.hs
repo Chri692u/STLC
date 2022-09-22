@@ -3,6 +3,7 @@ module Main where
 import Syntax
 import Scanner
 import Evaluation
+import Check
 
 import Control.Monad
 import Control.Monad.Trans
@@ -13,9 +14,11 @@ process line = do
   let ast = parseExpr line
   case ast of
     Left error -> print error
-    Right exp -> do
-      let output = eval exp []
-      print output
+    Right expr -> do
+      let tc = checkTop [] expr
+      case tc of
+        Left tError -> print tError
+        Right _ -> print $ eval expr []
 
 run :: String -> IO ()
 run filename = do

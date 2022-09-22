@@ -34,4 +34,6 @@ instance Show Value where
     show (Blit x) = show x
     show Closure{} = "<closure>"
 
+-- todo: make 1 single envoirnment
 type Env = [(Id, Value)]
+type TEnv = [(Id, Type)]
