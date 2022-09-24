@@ -7,15 +7,19 @@ import Control.Monad.Reader
 data TypeError = Mismatch Type Type
                | NotFunction Type
                | NotInScope Id
-               deriving (Show)
 
 type Check = ExceptT TypeError (Reader TEnv)
 
-inEnv :: (Id, Type) -> Check a -> Check a
-inEnv (x,t) = local (extend (x,t))
+instance Show TypeError where
+  show (Mismatch t1 t2) = "Type mismatch: type (" ++ show t1 ++ ") is not of type: (" ++ show t2 ++ ")"
+  show (NotFunction t1) = "Type (" ++ show t1 ++ ") is not a function. Lambda application can only be done on abstractions"
+  show (NotInScope v1) = "Variable (" ++ show v1 ++ ") is not in scope"
+  
+lookupTEnv :: (Id, Type) -> Check a -> Check a
+lookupTEnv (x,t) = local (extendTEnv (x,t))
 
-extend :: (Id, Type) -> TEnv -> TEnv
-extend xt env = xt : env
+extendTEnv :: (Id, Type) -> TEnv -> TEnv
+extendTEnv xt env = xt : env
 
 lookupVar :: Id -> Check Type
 lookupVar x = do
@@ -28,7 +32,7 @@ typeof :: Expr -> Check Type
 typeof (Lit (LInt x)) = return TInt
 typeof (Lit (LBool b)) = return TBool
 typeof (Lambda symbol type' body) = do
-    rhs <- inEnv (symbol, type') (typeof body)
+    rhs <- lookupTEnv (symbol, type') (typeof body)
     return (TArr type' rhs) 
 typeof (App e1 e2) = do
     t1 <- typeof e1

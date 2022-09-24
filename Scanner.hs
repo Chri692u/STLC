@@ -12,8 +12,8 @@ import Syntax
 
 scanner :: T.TokenParser ()
 scanner = T.makeTokenParser style
-  where ops = ["\\", "=", ".", "+", "-", "*", "/", ":"]
-        names = ["let", "in", "apply", "Bool", "Int", "True", "False"]
+  where ops = ["\\", ".", ":"]
+        names = ["apply", "Bool", "Int", "True", "False"]
         style = haskellStyle {T.reservedOpNames = ops,
                               T.reservedNames = names,
                               T.commentLine = "#"}
@@ -30,16 +30,9 @@ identifier = T.identifier scanner
 parens :: Parser a -> Parser a
 parens = T.parens scanner
 
-content :: Parser a -> Parser a
-content p = do
-    T.whiteSpace scanner
-    r <- p
-    eof
-    return r
-
 int :: Parser Integer
 int = T.integer scanner
-  
+
 variable :: Parser Expr
 variable = do
     x <- identifier
@@ -54,6 +47,23 @@ bool :: Parser Expr
 bool = (reserved "True" >> return (Lit (LBool True)))
      <|> (reserved "False" >> return (Lit (LBool False)))
 
+lambda :: Parser Expr
+lambda = do
+    reservedOp "\\"
+    arg <- identifier
+    reservedOp ":"
+    type' <- types
+    reservedOp "."
+    body <- expr
+    return (Lambda arg type' body)
+
+apply :: Parser Expr
+apply = do
+    reserved "apply"
+    abs <- expr
+    arg <- expr
+    return (App abs arg)
+
 tAtom :: Parser Type
 tAtom = tLit <|> (parens types)
 
@@ -67,51 +77,23 @@ types = X.buildExpressionParser tyops tAtom
         infixOp x f = X.Infix(reservedOp x >> return f)
         tyops = [ [infixOp "->" TArr X.AssocRight] ]
 
-letIn :: Parser Expr
-letIn = do
-    reserved "let"
-    x <- identifier
-    reservedOp "="
-    binding <- expr
-    reserved "in"
-    rest <- expr  
-    return (Let x binding rest)
-    
-lambda :: Parser Expr
-lambda = do
-    reservedOp "\\"
-    arg <- identifier
-    reservedOp ":"
-    type' <- types
-    reservedOp "."
-    body <- expr
-    return (Lambda arg type' body)
-    
-apply :: Parser Expr
-apply = do
-    reserved "apply"
-    abs <- expr
-    arg <- expr
-    return (App abs arg)
-    
 term :: Parser Expr
 term = parens expr
-       <|> letIn
        <|> variable
        <|> number
        <|> bool
        <|> lambda
        <|> apply
 
-expr :: Parser Expr
-expr = X.buildExpressionParser table term
+content :: Parser a -> Parser a
+content p = do
+    T.whiteSpace scanner
+    r <- p
+    eof
+    return r
 
-table = [
-    [X.Infix (reservedOp "*" >> return (Binary Mul)) X.AssocLeft,
-     X.Infix (reservedOp "/" >> return (Binary Div)) X.AssocLeft],
-    [X.Infix (reservedOp "+" >> return (Binary Add)) X.AssocLeft,
-     X.Infix (reservedOp "-" >> return (Binary Sub)) X.AssocLeft ]
-    ]
- 
+expr :: Parser Expr
+expr = X.buildExpressionParser [] term
+
 parseExpr :: String -> Either ParseError Expr
 parseExpr input = parse (content expr) "<stdin>" input

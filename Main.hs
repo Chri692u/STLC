@@ -9,8 +9,8 @@ import Control.Monad
 import Control.Monad.Trans
 import System.Console.Haskeline
         
-process :: String -> IO ()
-process line = do
+repl :: String -> IO ()
+repl line = do
   let ast = parseExpr line
   case ast of
     Left error -> print error
@@ -26,19 +26,33 @@ run filename = do
     let ast = parseExpr s
     case ast of
         Left error -> print error
-        Right exp -> do
-            let output = eval exp []
+        Right expr -> do
+            let output = eval expr []
             print output
 
-main :: IO ()
-main = runInputT defaultSettings loop
+type' :: String -> IO ()
+type' expr = do
+  let ast = parseExpr expr
+  case ast of
+    Left error -> print error
+    Right expr' -> do
+      let res = checkTop [] expr'
+      print res
+
+tlc :: IO ()
+tlc = runInputT defaultSettings loop
   where
   loop = do
-    minput <- getInputLine "8) "
+    minput <- getInputLine "\\.> "
     case minput of
-      Nothing -> outputStrLn "8("
       Just input -> do
-          let first = head $ words $ input
+          let first = head $ words input
           case first of
-              ":run" -> (liftIO $ run ((words $ input)!!1)) >> loop
-              _ -> (liftIO $ process input) >> loop
+              ":run"  -> (liftIO $ run ((words $ input)!!1)) >> loop
+              ":type" -> (liftIO $ type' (unwords $ drop 1 $ words input)) >> loop
+              ":exit" -> outputStrLn "quitting repl..."
+              _ -> (liftIO $ repl input) >> loop
+
+main :: IO ()
+main = do
+  tlc
